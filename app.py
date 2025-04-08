@@ -3,6 +3,7 @@ import joblib
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 
 # Load your model and vectorizer
 model = joblib.load("rf_model.pkl")
@@ -31,21 +32,33 @@ if user_text:
 if st.button("🔍 Analyze Sentiment"):
     # Vectorize Input
     input_vector = vectorizer.transform([user_text])
-
-    import numpy as np
-
     prob = model.predict_proba(input_vector)[0]
-    class_names = ['Negative', 'Positive']  # Ensure order matches       model training
+    class_names = model.classes_  # ['Negative', 'Positive']
     pred_index = np.argmax(prob)
     sentiment = class_names[pred_index]
     sentiment_color = "green" if sentiment == "Positive" else "red"
 
-
-    # Show Result
+    # Show Sentiment Result
     st.markdown(f"### ✅ Predicted Sentiment: :{sentiment_color}[{sentiment}]")
 
+    # --- Bar Chart Visualization ---
+    st.subheader("📈 Prediction Probability - Bar Chart")
+    fig_bar, ax_bar = plt.subplots()
+    sns.barplot(x=class_names, y=prob, palette='viridis', ax=ax_bar)
+    ax_bar.set_ylabel("Probability")
+    ax_bar.set_xlabel("Sentiment")
+    ax_bar.set_ylim(0, 1)
+    for i, v in enumerate(prob):
+        ax_bar.text(i, v + 0.02, f"{v:.2f}", ha='center', fontsize=10)
+    st.pyplot(fig_bar)
 
-   
+    # --- Pie Chart Visualization ---
+    st.subheader("🥧 Prediction Probability - Pie Chart")
+    fig_pie, ax_pie = plt.subplots()
+    pie_colors = ['lightcoral', 'lightgreen'] if 'Positive' in class_names else ['lightblue', 'lightpink']
+    ax_pie.pie(prob, labels=class_names, autopct='%1.1f%%', colors=pie_colors, startangle=90)
+    ax_pie.axis('equal')  # Equal aspect ratio ensures pie is circular
+    st.pyplot(fig_pie)
 
 # Footer
 st.markdown("---")
