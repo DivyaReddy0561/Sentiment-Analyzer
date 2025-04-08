@@ -9,7 +9,7 @@ model = joblib.load("rf_model.pkl")
 vectorizer = joblib.load("tfidf_vectorizer.pkl")
 
 # Page Title
-st.title("🇺🇸 United States Wikipedia Sentiment Analyzer")
+st.title("United States Wikipedia Sentiment Analyzer")
 st.subheader("📊 Powered by Random Forest + TextBlob")
 
 # Description
